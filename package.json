@@ -21,6 +21,7 @@
     "react-scripts": "3.1.2",
     "react-spring": "^8.0.27",
     "redux": "4.0.4",
+    "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "2.3.0",
     "typescript": "3.6.3"
   },
@@ -40,8 +41,7 @@
     "@types/react-redux": "7.1.4",
     "@types/react-router-dom": "5.1.0",
     "@types/redux-devtools-extension": "^2.13.2",
-    "@types/redux-thunk": "^2.1.0",
-    "redux-devtools-extension": "^2.13.8"
+    "@types/redux-thunk": "^2.1.0"
   },
   "scripts": {
     "start": "react-scripts start",
