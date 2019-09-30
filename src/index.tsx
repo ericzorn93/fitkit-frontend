@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import {Provider, ReactReduxContext} from 'react-redux'
 import {ConnectedRouter} from 'connected-react-router';
 import {ApolloProvider} from '@apollo/react-hooks';
+import ReactGA from 'react-ga';
 
 import './index.css';
 import * as serviceWorker from './serviceWorker';
@@ -27,6 +28,13 @@ const RootComponent = () => {
 }
 
 
+// Initialize Google Analytics
+ReactGA.initialize("UA-132682812-3", {
+  debug: false
+});
+ReactGA.pageview(window.location.pathname + window.location.search);
+
+// Render root of React application
 ReactDOM.render(<RootComponent />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
