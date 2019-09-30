@@ -5,24 +5,24 @@ import {ConnectedRouter} from 'connected-react-router';
 import {ApolloProvider} from '@apollo/react-hooks';
 
 import './index.css';
-import App from './App';
 import * as serviceWorker from './serviceWorker';
 import assembleStore from './store';
-import history from './router/router.history';
+import history from './router/history/router.history';
 import apolloClient from './apollo';
+import MainRouter from './router/MainRouter';
 
 
 const RootComponent = () => {
   const store = assembleStore();
 
   return (
-    <ApolloProvider client={apolloClient}>
       <Provider store={store}>
         <ConnectedRouter history={history} context={ReactReduxContext}>
-          <App/>
+          <ApolloProvider client={apolloClient}>
+            <MainRouter/>
+          </ApolloProvider>
         </ConnectedRouter>
       </Provider>
-    </ApolloProvider>
   )
 }
 

@@ -1,7 +1,7 @@
 import {combineReducers} from 'redux';
 import {connectRouter} from 'connected-react-router'
 
-import history from '../../router/router.history';
+import history from '../../router/history/router.history';
 
 // Reducer that combines all Global Application State
 const rootReducer = combineReducers({

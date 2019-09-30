@@ -1,6 +1,11 @@
-query allFoods {
+query allFoodsWithCuisines {
   allFoods {
     id
     name
+    description
+    cuisine {
+      id
+      name
+    }
   }
 }

@@ -21,11 +21,24 @@ export type AuthenticatedUser = {
   jwt: Scalars['String'],
 };
 
+export type Cuisine = {
+   __typename?: 'Cuisine',
+  id: Scalars['ID'],
+  /** Food Cuisine Name */
+  name: Scalars['String'],
+  foods: Array<Food>,
+  createdAt: Scalars['String'],
+  updatedAt: Scalars['String'],
+};
+
 export type Food = {
    __typename?: 'Food',
   id: Scalars['ID'],
   /** Name of associated food item. */
   name: Scalars['String'],
+  description: Scalars['String'],
+  /** Relationship between a single food and its cuisine. */
+  cuisine: Cuisine,
   createdAt: Scalars['String'],
   updatedAt: Scalars['String'],
 };
@@ -71,6 +84,7 @@ export type Query = {
   /** Finds one user by ID and returns the user. */
   findUser: User,
   allFoods: Array<Food>,
+  allCuisines: Array<Cuisine>,
 };
 
 
@@ -102,49 +116,107 @@ export type User = {
   createdAt: Scalars['String'],
   updatedAt: Scalars['String'],
 };
-export type AllFoodsQueryVariables = {};
+export type AllFoodsWithCuisinesQueryVariables = {};
 
 
-export type AllFoodsQuery = (
+export type AllFoodsWithCuisinesQuery = (
   { __typename?: 'Query' }
   & { allFoods: Array<(
     { __typename?: 'Food' }
-    & Pick<Food, 'id' | 'name'>
+    & Pick<Food, 'id' | 'name' | 'description'>
+    & { cuisine: (
+      { __typename?: 'Cuisine' }
+      & Pick<Cuisine, 'id' | 'name'>
+    ) }
   )> }
 );
 
-export const AllFoodsDocument = gql`
-    query allFoods {
+export type AllUsersQueryVariables = {};
+
+
+export type AllUsersQuery = (
+  { __typename?: 'Query' }
+  & { allUsers: Array<(
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'firstName' | 'lastName' | 'fullName' | 'age'>
+  )> }
+);
+
+export const AllFoodsWithCuisinesDocument = gql`
+    query allFoodsWithCuisines {
   allFoods {
     id
     name
+    description
+    cuisine {
+      id
+      name
+    }
   }
 }
     `;
-export type AllFoodsComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<AllFoodsQuery, AllFoodsQueryVariables>, 'query'>;
+export type AllFoodsWithCuisinesComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<AllFoodsWithCuisinesQuery, AllFoodsWithCuisinesQueryVariables>, 'query'>;
 
-    export const AllFoodsComponent = (props: AllFoodsComponentProps) => (
-      <ApolloReactComponents.Query<AllFoodsQuery, AllFoodsQueryVariables> query={AllFoodsDocument} {...props} />
+    export const AllFoodsWithCuisinesComponent = (props: AllFoodsWithCuisinesComponentProps) => (
+      <ApolloReactComponents.Query<AllFoodsWithCuisinesQuery, AllFoodsWithCuisinesQueryVariables> query={AllFoodsWithCuisinesDocument} {...props} />
     );
     
-export type AllFoodsProps<TChildProps = {}> = ApolloReactHoc.DataProps<AllFoodsQuery, AllFoodsQueryVariables> & TChildProps;
-export function withAllFoods<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+export type AllFoodsWithCuisinesProps<TChildProps = {}> = ApolloReactHoc.DataProps<AllFoodsWithCuisinesQuery, AllFoodsWithCuisinesQueryVariables> & TChildProps;
+export function withAllFoodsWithCuisines<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
   TProps,
-  AllFoodsQuery,
-  AllFoodsQueryVariables,
-  AllFoodsProps<TChildProps>>) {
-    return ApolloReactHoc.withQuery<TProps, AllFoodsQuery, AllFoodsQueryVariables, AllFoodsProps<TChildProps>>(AllFoodsDocument, {
-      alias: 'allFoods',
+  AllFoodsWithCuisinesQuery,
+  AllFoodsWithCuisinesQueryVariables,
+  AllFoodsWithCuisinesProps<TChildProps>>) {
+    return ApolloReactHoc.withQuery<TProps, AllFoodsWithCuisinesQuery, AllFoodsWithCuisinesQueryVariables, AllFoodsWithCuisinesProps<TChildProps>>(AllFoodsWithCuisinesDocument, {
+      alias: 'allFoodsWithCuisines',
       ...operationOptions
     });
 };
 
-    export function useAllFoodsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<AllFoodsQuery, AllFoodsQueryVariables>) {
-      return ApolloReactHooks.useQuery<AllFoodsQuery, AllFoodsQueryVariables>(AllFoodsDocument, baseOptions);
+    export function useAllFoodsWithCuisinesQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<AllFoodsWithCuisinesQuery, AllFoodsWithCuisinesQueryVariables>) {
+      return ApolloReactHooks.useQuery<AllFoodsWithCuisinesQuery, AllFoodsWithCuisinesQueryVariables>(AllFoodsWithCuisinesDocument, baseOptions);
     }
-      export function useAllFoodsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<AllFoodsQuery, AllFoodsQueryVariables>) {
-        return ApolloReactHooks.useLazyQuery<AllFoodsQuery, AllFoodsQueryVariables>(AllFoodsDocument, baseOptions);
+      export function useAllFoodsWithCuisinesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<AllFoodsWithCuisinesQuery, AllFoodsWithCuisinesQueryVariables>) {
+        return ApolloReactHooks.useLazyQuery<AllFoodsWithCuisinesQuery, AllFoodsWithCuisinesQueryVariables>(AllFoodsWithCuisinesDocument, baseOptions);
       }
       
-export type AllFoodsQueryHookResult = ReturnType<typeof useAllFoodsQuery>;
-export type AllFoodsQueryResult = ApolloReactCommon.QueryResult<AllFoodsQuery, AllFoodsQueryVariables>;
+export type AllFoodsWithCuisinesQueryHookResult = ReturnType<typeof useAllFoodsWithCuisinesQuery>;
+export type AllFoodsWithCuisinesQueryResult = ApolloReactCommon.QueryResult<AllFoodsWithCuisinesQuery, AllFoodsWithCuisinesQueryVariables>;
+export const AllUsersDocument = gql`
+    query allUsers {
+  allUsers {
+    id
+    firstName
+    lastName
+    fullName
+    age
+  }
+}
+    `;
+export type AllUsersComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<AllUsersQuery, AllUsersQueryVariables>, 'query'>;
+
+    export const AllUsersComponent = (props: AllUsersComponentProps) => (
+      <ApolloReactComponents.Query<AllUsersQuery, AllUsersQueryVariables> query={AllUsersDocument} {...props} />
+    );
+    
+export type AllUsersProps<TChildProps = {}> = ApolloReactHoc.DataProps<AllUsersQuery, AllUsersQueryVariables> & TChildProps;
+export function withAllUsers<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  AllUsersQuery,
+  AllUsersQueryVariables,
+  AllUsersProps<TChildProps>>) {
+    return ApolloReactHoc.withQuery<TProps, AllUsersQuery, AllUsersQueryVariables, AllUsersProps<TChildProps>>(AllUsersDocument, {
+      alias: 'allUsers',
+      ...operationOptions
+    });
+};
+
+    export function useAllUsersQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<AllUsersQuery, AllUsersQueryVariables>) {
+      return ApolloReactHooks.useQuery<AllUsersQuery, AllUsersQueryVariables>(AllUsersDocument, baseOptions);
+    }
+      export function useAllUsersLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<AllUsersQuery, AllUsersQueryVariables>) {
+        return ApolloReactHooks.useLazyQuery<AllUsersQuery, AllUsersQueryVariables>(AllUsersDocument, baseOptions);
+      }
+      
+export type AllUsersQueryHookResult = ReturnType<typeof useAllUsersQuery>;
+export type AllUsersQueryResult = ApolloReactCommon.QueryResult<AllUsersQuery, AllUsersQueryVariables>;
