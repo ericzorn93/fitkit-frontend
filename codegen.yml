@@ -1,0 +1,13 @@
+overwrite: true
+schema: "https://fitkit-backend.herokuapp.com/graphql"
+documents: "src/graphql/**/*.graphql"
+generates:
+  src/generated/graphqlComponents.tsx:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+    config:
+      withHOC: true
+      withComponent: true
+      withHooks: true

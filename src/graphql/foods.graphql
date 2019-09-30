@@ -1,0 +1,6 @@
+query allFoods {
+  allFoods {
+    id
+    name
+  }
+}
