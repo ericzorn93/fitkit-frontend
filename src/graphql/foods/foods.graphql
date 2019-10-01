@@ -1,3 +1,11 @@
+query allFoods {
+  allFoods {
+    id
+    name
+    description
+  }
+}
+
 query allFoodsWithCuisines {
   allFoods {
     id

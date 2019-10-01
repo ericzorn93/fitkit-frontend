@@ -1,0 +1,37 @@
+# Gets All Cuisines
+query allCuisines {
+  allCuisines {
+    id
+    name
+  }
+}
+
+# Creates a cuisine without any related food items
+mutation createCuisine($name: String!) {
+  createCuisine(cuisineData: { name: $name }) {
+    id
+    name
+  }
+}
+
+# Deletes Cuisine and all related Food Items
+mutation deleteCuisine($id: String!) {
+  deleteCuisine(cuisineId: $id) {
+    id
+    name
+    foods {
+      name
+    }
+  }
+}
+
+# Update a food item with a cuisine, if the food item or the cuisine item does not exist,
+# do not allow the food item or the cuisine to be updated.
+mutation updateFoodWithCuisine($cuisineId: String!, $foodId: String!) {
+  updateFoodWithCuisine(
+    updateFoodCuisineData: { cuisineId: $cuisineId, foodId: $foodId }
+  ) {
+    id
+    name
+  }
+}

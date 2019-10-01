@@ -73,6 +73,8 @@ export type Mutation = {
   deleteAllUsers?: Maybe<Array<User>>,
   createFood: Food,
   deleteFood: Food,
+  /** Finds an item of food, and updates the food with an associated cuisine. */
+  updateFoodWithCuisine: Food,
   createCuisine: Cuisine,
   deleteCuisine?: Maybe<Cuisine>,
 };
@@ -100,6 +102,11 @@ export type MutationCreateFoodArgs = {
 
 export type MutationDeleteFoodArgs = {
   foodId: Scalars['String']
+};
+
+
+export type MutationUpdateFoodWithCuisineArgs = {
+  updateFoodCuisineData: UpdateFoodCuisineInput
 };
 
 
@@ -137,6 +144,11 @@ export type RegisterUserInput = {
   password: Scalars['String'],
 };
 
+export type UpdateFoodCuisineInput = {
+  foodId: Scalars['String'],
+  cuisineId: Scalars['String'],
+};
+
 export type User = {
    __typename?: 'User',
   id: Scalars['ID'],
@@ -154,6 +166,72 @@ export type User = {
   createdAt: Scalars['String'],
   updatedAt: Scalars['String'],
 };
+export type AllCuisinesQueryVariables = {};
+
+
+export type AllCuisinesQuery = (
+  { __typename?: 'Query' }
+  & { allCuisines: Array<(
+    { __typename?: 'Cuisine' }
+    & Pick<Cuisine, 'id' | 'name'>
+  )> }
+);
+
+export type CreateCuisineMutationVariables = {
+  name: Scalars['String']
+};
+
+
+export type CreateCuisineMutation = (
+  { __typename?: 'Mutation' }
+  & { createCuisine: (
+    { __typename?: 'Cuisine' }
+    & Pick<Cuisine, 'id' | 'name'>
+  ) }
+);
+
+export type DeleteCuisineMutationVariables = {
+  id: Scalars['String']
+};
+
+
+export type DeleteCuisineMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteCuisine: Maybe<(
+    { __typename?: 'Cuisine' }
+    & Pick<Cuisine, 'id' | 'name'>
+    & { foods: Maybe<Array<(
+      { __typename?: 'Food' }
+      & Pick<Food, 'name'>
+    )>> }
+  )> }
+);
+
+export type UpdateFoodWithCuisineMutationVariables = {
+  cuisineId: Scalars['String'],
+  foodId: Scalars['String']
+};
+
+
+export type UpdateFoodWithCuisineMutation = (
+  { __typename?: 'Mutation' }
+  & { updateFoodWithCuisine: (
+    { __typename?: 'Food' }
+    & Pick<Food, 'id' | 'name'>
+  ) }
+);
+
+export type AllFoodsQueryVariables = {};
+
+
+export type AllFoodsQuery = (
+  { __typename?: 'Query' }
+  & { allFoods: Array<(
+    { __typename?: 'Food' }
+    & Pick<Food, 'id' | 'name' | 'description'>
+  )> }
+);
+
 export type AllFoodsWithCuisinesQueryVariables = {};
 
 
@@ -230,6 +308,179 @@ export type DeleteAllUsersMutation = (
   )>> }
 );
 
+export const AllCuisinesDocument = gql`
+    query allCuisines {
+  allCuisines {
+    id
+    name
+  }
+}
+    `;
+export type AllCuisinesComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<AllCuisinesQuery, AllCuisinesQueryVariables>, 'query'>;
+
+    export const AllCuisinesComponent = (props: AllCuisinesComponentProps) => (
+      <ApolloReactComponents.Query<AllCuisinesQuery, AllCuisinesQueryVariables> query={AllCuisinesDocument} {...props} />
+    );
+    
+export type AllCuisinesProps<TChildProps = {}> = ApolloReactHoc.DataProps<AllCuisinesQuery, AllCuisinesQueryVariables> & TChildProps;
+export function withAllCuisines<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  AllCuisinesQuery,
+  AllCuisinesQueryVariables,
+  AllCuisinesProps<TChildProps>>) {
+    return ApolloReactHoc.withQuery<TProps, AllCuisinesQuery, AllCuisinesQueryVariables, AllCuisinesProps<TChildProps>>(AllCuisinesDocument, {
+      alias: 'allCuisines',
+      ...operationOptions
+    });
+};
+
+    export function useAllCuisinesQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<AllCuisinesQuery, AllCuisinesQueryVariables>) {
+      return ApolloReactHooks.useQuery<AllCuisinesQuery, AllCuisinesQueryVariables>(AllCuisinesDocument, baseOptions);
+    }
+      export function useAllCuisinesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<AllCuisinesQuery, AllCuisinesQueryVariables>) {
+        return ApolloReactHooks.useLazyQuery<AllCuisinesQuery, AllCuisinesQueryVariables>(AllCuisinesDocument, baseOptions);
+      }
+      
+export type AllCuisinesQueryHookResult = ReturnType<typeof useAllCuisinesQuery>;
+export type AllCuisinesQueryResult = ApolloReactCommon.QueryResult<AllCuisinesQuery, AllCuisinesQueryVariables>;
+export const CreateCuisineDocument = gql`
+    mutation createCuisine($name: String!) {
+  createCuisine(cuisineData: {name: $name}) {
+    id
+    name
+  }
+}
+    `;
+export type CreateCuisineMutationFn = ApolloReactCommon.MutationFunction<CreateCuisineMutation, CreateCuisineMutationVariables>;
+export type CreateCuisineComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<CreateCuisineMutation, CreateCuisineMutationVariables>, 'mutation'>;
+
+    export const CreateCuisineComponent = (props: CreateCuisineComponentProps) => (
+      <ApolloReactComponents.Mutation<CreateCuisineMutation, CreateCuisineMutationVariables> mutation={CreateCuisineDocument} {...props} />
+    );
+    
+export type CreateCuisineProps<TChildProps = {}> = ApolloReactHoc.MutateProps<CreateCuisineMutation, CreateCuisineMutationVariables> & TChildProps;
+export function withCreateCuisine<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  CreateCuisineMutation,
+  CreateCuisineMutationVariables,
+  CreateCuisineProps<TChildProps>>) {
+    return ApolloReactHoc.withMutation<TProps, CreateCuisineMutation, CreateCuisineMutationVariables, CreateCuisineProps<TChildProps>>(CreateCuisineDocument, {
+      alias: 'createCuisine',
+      ...operationOptions
+    });
+};
+
+    export function useCreateCuisineMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateCuisineMutation, CreateCuisineMutationVariables>) {
+      return ApolloReactHooks.useMutation<CreateCuisineMutation, CreateCuisineMutationVariables>(CreateCuisineDocument, baseOptions);
+    }
+export type CreateCuisineMutationHookResult = ReturnType<typeof useCreateCuisineMutation>;
+export type CreateCuisineMutationResult = ApolloReactCommon.MutationResult<CreateCuisineMutation>;
+export type CreateCuisineMutationOptions = ApolloReactCommon.BaseMutationOptions<CreateCuisineMutation, CreateCuisineMutationVariables>;
+export const DeleteCuisineDocument = gql`
+    mutation deleteCuisine($id: String!) {
+  deleteCuisine(cuisineId: $id) {
+    id
+    name
+    foods {
+      name
+    }
+  }
+}
+    `;
+export type DeleteCuisineMutationFn = ApolloReactCommon.MutationFunction<DeleteCuisineMutation, DeleteCuisineMutationVariables>;
+export type DeleteCuisineComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<DeleteCuisineMutation, DeleteCuisineMutationVariables>, 'mutation'>;
+
+    export const DeleteCuisineComponent = (props: DeleteCuisineComponentProps) => (
+      <ApolloReactComponents.Mutation<DeleteCuisineMutation, DeleteCuisineMutationVariables> mutation={DeleteCuisineDocument} {...props} />
+    );
+    
+export type DeleteCuisineProps<TChildProps = {}> = ApolloReactHoc.MutateProps<DeleteCuisineMutation, DeleteCuisineMutationVariables> & TChildProps;
+export function withDeleteCuisine<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  DeleteCuisineMutation,
+  DeleteCuisineMutationVariables,
+  DeleteCuisineProps<TChildProps>>) {
+    return ApolloReactHoc.withMutation<TProps, DeleteCuisineMutation, DeleteCuisineMutationVariables, DeleteCuisineProps<TChildProps>>(DeleteCuisineDocument, {
+      alias: 'deleteCuisine',
+      ...operationOptions
+    });
+};
+
+    export function useDeleteCuisineMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteCuisineMutation, DeleteCuisineMutationVariables>) {
+      return ApolloReactHooks.useMutation<DeleteCuisineMutation, DeleteCuisineMutationVariables>(DeleteCuisineDocument, baseOptions);
+    }
+export type DeleteCuisineMutationHookResult = ReturnType<typeof useDeleteCuisineMutation>;
+export type DeleteCuisineMutationResult = ApolloReactCommon.MutationResult<DeleteCuisineMutation>;
+export type DeleteCuisineMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteCuisineMutation, DeleteCuisineMutationVariables>;
+export const UpdateFoodWithCuisineDocument = gql`
+    mutation updateFoodWithCuisine($cuisineId: String!, $foodId: String!) {
+  updateFoodWithCuisine(updateFoodCuisineData: {cuisineId: $cuisineId, foodId: $foodId}) {
+    id
+    name
+  }
+}
+    `;
+export type UpdateFoodWithCuisineMutationFn = ApolloReactCommon.MutationFunction<UpdateFoodWithCuisineMutation, UpdateFoodWithCuisineMutationVariables>;
+export type UpdateFoodWithCuisineComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<UpdateFoodWithCuisineMutation, UpdateFoodWithCuisineMutationVariables>, 'mutation'>;
+
+    export const UpdateFoodWithCuisineComponent = (props: UpdateFoodWithCuisineComponentProps) => (
+      <ApolloReactComponents.Mutation<UpdateFoodWithCuisineMutation, UpdateFoodWithCuisineMutationVariables> mutation={UpdateFoodWithCuisineDocument} {...props} />
+    );
+    
+export type UpdateFoodWithCuisineProps<TChildProps = {}> = ApolloReactHoc.MutateProps<UpdateFoodWithCuisineMutation, UpdateFoodWithCuisineMutationVariables> & TChildProps;
+export function withUpdateFoodWithCuisine<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  UpdateFoodWithCuisineMutation,
+  UpdateFoodWithCuisineMutationVariables,
+  UpdateFoodWithCuisineProps<TChildProps>>) {
+    return ApolloReactHoc.withMutation<TProps, UpdateFoodWithCuisineMutation, UpdateFoodWithCuisineMutationVariables, UpdateFoodWithCuisineProps<TChildProps>>(UpdateFoodWithCuisineDocument, {
+      alias: 'updateFoodWithCuisine',
+      ...operationOptions
+    });
+};
+
+    export function useUpdateFoodWithCuisineMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateFoodWithCuisineMutation, UpdateFoodWithCuisineMutationVariables>) {
+      return ApolloReactHooks.useMutation<UpdateFoodWithCuisineMutation, UpdateFoodWithCuisineMutationVariables>(UpdateFoodWithCuisineDocument, baseOptions);
+    }
+export type UpdateFoodWithCuisineMutationHookResult = ReturnType<typeof useUpdateFoodWithCuisineMutation>;
+export type UpdateFoodWithCuisineMutationResult = ApolloReactCommon.MutationResult<UpdateFoodWithCuisineMutation>;
+export type UpdateFoodWithCuisineMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateFoodWithCuisineMutation, UpdateFoodWithCuisineMutationVariables>;
+export const AllFoodsDocument = gql`
+    query allFoods {
+  allFoods {
+    id
+    name
+    description
+  }
+}
+    `;
+export type AllFoodsComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<AllFoodsQuery, AllFoodsQueryVariables>, 'query'>;
+
+    export const AllFoodsComponent = (props: AllFoodsComponentProps) => (
+      <ApolloReactComponents.Query<AllFoodsQuery, AllFoodsQueryVariables> query={AllFoodsDocument} {...props} />
+    );
+    
+export type AllFoodsProps<TChildProps = {}> = ApolloReactHoc.DataProps<AllFoodsQuery, AllFoodsQueryVariables> & TChildProps;
+export function withAllFoods<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  AllFoodsQuery,
+  AllFoodsQueryVariables,
+  AllFoodsProps<TChildProps>>) {
+    return ApolloReactHoc.withQuery<TProps, AllFoodsQuery, AllFoodsQueryVariables, AllFoodsProps<TChildProps>>(AllFoodsDocument, {
+      alias: 'allFoods',
+      ...operationOptions
+    });
+};
+
+    export function useAllFoodsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<AllFoodsQuery, AllFoodsQueryVariables>) {
+      return ApolloReactHooks.useQuery<AllFoodsQuery, AllFoodsQueryVariables>(AllFoodsDocument, baseOptions);
+    }
+      export function useAllFoodsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<AllFoodsQuery, AllFoodsQueryVariables>) {
+        return ApolloReactHooks.useLazyQuery<AllFoodsQuery, AllFoodsQueryVariables>(AllFoodsDocument, baseOptions);
+      }
+      
+export type AllFoodsQueryHookResult = ReturnType<typeof useAllFoodsQuery>;
+export type AllFoodsQueryResult = ApolloReactCommon.QueryResult<AllFoodsQuery, AllFoodsQueryVariables>;
 export const AllFoodsWithCuisinesDocument = gql`
     query allFoodsWithCuisines {
   allFoods {
