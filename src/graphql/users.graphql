@@ -1,9 +1,61 @@
 query allUsers {
   allUsers {
     id
-    firstName
-    lastName
     fullName
+    birthday
+    formattedBirthday
     age
+    emailAddress
+    createdAt
+  }
+}
+
+mutation registerUser(
+  $firstName: String!
+  $lastName: String!
+  $emailAddress: String!
+  $birthday: String!
+  $password: String!
+) {
+  registerUser(
+    registerUserData: {
+      firstName: $firstName
+      lastName: $lastName
+      emailAddress: $emailAddress
+      birthday: $birthday
+      password: $password
+    }
+  ) {
+    user {
+      id
+      fullName
+      emailAddress
+      birthday
+      formattedBirthday
+    }
+    jwt
+  }
+}
+
+mutation loginUser($emailAddress: String!, $password: String!) {
+  loginUser(
+    loginUserData: { emailAddress: $emailAddress, password: $password }
+  ) {
+    user {
+      id
+      fullName
+      emailAddress
+      formattedBirthday
+    }
+    jwt
+  }
+}
+
+mutation deleteAllUsers {
+  deleteAllUsers {
+    id
+    fullName
+    emailAddress
+    formattedBirthday
   }
 }

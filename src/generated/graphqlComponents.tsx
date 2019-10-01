@@ -21,12 +21,24 @@ export type AuthenticatedUser = {
   jwt: Scalars['String'],
 };
 
+export type CreateCuisineInput = {
+  name: Scalars['String'],
+};
+
+export type CreateFoodInput = {
+  name: Scalars['String'],
+  description: Scalars['String'],
+  cuisineName: Scalars['String'],
+  /** Uses the User ID from the database */
+  userId?: Maybe<Scalars['String']>,
+};
+
 export type Cuisine = {
    __typename?: 'Cuisine',
   id: Scalars['ID'],
   /** Food Cuisine Name */
   name: Scalars['String'],
-  foods: Array<Food>,
+  foods?: Maybe<Array<Food>>,
   createdAt: Scalars['String'],
   updatedAt: Scalars['String'],
 };
@@ -38,7 +50,8 @@ export type Food = {
   name: Scalars['String'],
   description: Scalars['String'],
   /** Relationship between a single food and its cuisine. */
-  cuisine: Cuisine,
+  cuisine?: Maybe<Cuisine>,
+  users?: Maybe<Array<User>>,
   createdAt: Scalars['String'],
   updatedAt: Scalars['String'],
 };
@@ -58,6 +71,10 @@ export type Mutation = {
   deleteUser?: Maybe<User>,
   /** Used to remove all users from the database. */
   deleteAllUsers?: Maybe<Array<User>>,
+  createFood: Food,
+  deleteFood: Food,
+  createCuisine: Cuisine,
+  deleteCuisine?: Maybe<Cuisine>,
 };
 
 
@@ -73,6 +90,26 @@ export type MutationLoginUserArgs = {
 
 export type MutationDeleteUserArgs = {
   userId: Scalars['String']
+};
+
+
+export type MutationCreateFoodArgs = {
+  foodData: CreateFoodInput
+};
+
+
+export type MutationDeleteFoodArgs = {
+  foodId: Scalars['String']
+};
+
+
+export type MutationCreateCuisineArgs = {
+  cuisineData: CreateCuisineInput
+};
+
+
+export type MutationDeleteCuisineArgs = {
+  cuisineId: Scalars['String']
 };
 
 export type Query = {
@@ -113,6 +150,7 @@ export type User = {
   /** The age of the user as an integer. */
   age: Scalars['Int'],
   emailAddress: Scalars['String'],
+  foods?: Maybe<Array<Food>>,
   createdAt: Scalars['String'],
   updatedAt: Scalars['String'],
 };
@@ -124,10 +162,10 @@ export type AllFoodsWithCuisinesQuery = (
   & { allFoods: Array<(
     { __typename?: 'Food' }
     & Pick<Food, 'id' | 'name' | 'description'>
-    & { cuisine: (
+    & { cuisine: Maybe<(
       { __typename?: 'Cuisine' }
       & Pick<Cuisine, 'id' | 'name'>
-    ) }
+    )> }
   )> }
 );
 
@@ -138,8 +176,58 @@ export type AllUsersQuery = (
   { __typename?: 'Query' }
   & { allUsers: Array<(
     { __typename?: 'User' }
-    & Pick<User, 'id' | 'firstName' | 'lastName' | 'fullName' | 'age'>
+    & Pick<User, 'id' | 'fullName' | 'birthday' | 'formattedBirthday' | 'age' | 'emailAddress' | 'createdAt'>
   )> }
+);
+
+export type RegisterUserMutationVariables = {
+  firstName: Scalars['String'],
+  lastName: Scalars['String'],
+  emailAddress: Scalars['String'],
+  birthday: Scalars['String'],
+  password: Scalars['String']
+};
+
+
+export type RegisterUserMutation = (
+  { __typename?: 'Mutation' }
+  & { registerUser: (
+    { __typename?: 'AuthenticatedUser' }
+    & Pick<AuthenticatedUser, 'jwt'>
+    & { user: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'fullName' | 'emailAddress' | 'birthday' | 'formattedBirthday'>
+    ) }
+  ) }
+);
+
+export type LoginUserMutationVariables = {
+  emailAddress: Scalars['String'],
+  password: Scalars['String']
+};
+
+
+export type LoginUserMutation = (
+  { __typename?: 'Mutation' }
+  & { loginUser: (
+    { __typename?: 'AuthenticatedUser' }
+    & Pick<AuthenticatedUser, 'jwt'>
+    & { user: (
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'fullName' | 'emailAddress' | 'formattedBirthday'>
+    ) }
+  ) }
+);
+
+export type DeleteAllUsersMutationVariables = {};
+
+
+export type DeleteAllUsersMutation = (
+  { __typename?: 'Mutation' }
+  & { deleteAllUsers: Maybe<Array<(
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'fullName' | 'emailAddress' | 'formattedBirthday'>
+  )>> }
 );
 
 export const AllFoodsWithCuisinesDocument = gql`
@@ -186,10 +274,12 @@ export const AllUsersDocument = gql`
     query allUsers {
   allUsers {
     id
-    firstName
-    lastName
     fullName
+    birthday
+    formattedBirthday
     age
+    emailAddress
+    createdAt
   }
 }
     `;
@@ -220,3 +310,115 @@ export function withAllUsers<TProps, TChildProps = {}>(operationOptions?: Apollo
       
 export type AllUsersQueryHookResult = ReturnType<typeof useAllUsersQuery>;
 export type AllUsersQueryResult = ApolloReactCommon.QueryResult<AllUsersQuery, AllUsersQueryVariables>;
+export const RegisterUserDocument = gql`
+    mutation registerUser($firstName: String!, $lastName: String!, $emailAddress: String!, $birthday: String!, $password: String!) {
+  registerUser(registerUserData: {firstName: $firstName, lastName: $lastName, emailAddress: $emailAddress, birthday: $birthday, password: $password}) {
+    user {
+      id
+      fullName
+      emailAddress
+      birthday
+      formattedBirthday
+    }
+    jwt
+  }
+}
+    `;
+export type RegisterUserMutationFn = ApolloReactCommon.MutationFunction<RegisterUserMutation, RegisterUserMutationVariables>;
+export type RegisterUserComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<RegisterUserMutation, RegisterUserMutationVariables>, 'mutation'>;
+
+    export const RegisterUserComponent = (props: RegisterUserComponentProps) => (
+      <ApolloReactComponents.Mutation<RegisterUserMutation, RegisterUserMutationVariables> mutation={RegisterUserDocument} {...props} />
+    );
+    
+export type RegisterUserProps<TChildProps = {}> = ApolloReactHoc.MutateProps<RegisterUserMutation, RegisterUserMutationVariables> & TChildProps;
+export function withRegisterUser<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  RegisterUserMutation,
+  RegisterUserMutationVariables,
+  RegisterUserProps<TChildProps>>) {
+    return ApolloReactHoc.withMutation<TProps, RegisterUserMutation, RegisterUserMutationVariables, RegisterUserProps<TChildProps>>(RegisterUserDocument, {
+      alias: 'registerUser',
+      ...operationOptions
+    });
+};
+
+    export function useRegisterUserMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RegisterUserMutation, RegisterUserMutationVariables>) {
+      return ApolloReactHooks.useMutation<RegisterUserMutation, RegisterUserMutationVariables>(RegisterUserDocument, baseOptions);
+    }
+export type RegisterUserMutationHookResult = ReturnType<typeof useRegisterUserMutation>;
+export type RegisterUserMutationResult = ApolloReactCommon.MutationResult<RegisterUserMutation>;
+export type RegisterUserMutationOptions = ApolloReactCommon.BaseMutationOptions<RegisterUserMutation, RegisterUserMutationVariables>;
+export const LoginUserDocument = gql`
+    mutation loginUser($emailAddress: String!, $password: String!) {
+  loginUser(loginUserData: {emailAddress: $emailAddress, password: $password}) {
+    user {
+      id
+      fullName
+      emailAddress
+      formattedBirthday
+    }
+    jwt
+  }
+}
+    `;
+export type LoginUserMutationFn = ApolloReactCommon.MutationFunction<LoginUserMutation, LoginUserMutationVariables>;
+export type LoginUserComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<LoginUserMutation, LoginUserMutationVariables>, 'mutation'>;
+
+    export const LoginUserComponent = (props: LoginUserComponentProps) => (
+      <ApolloReactComponents.Mutation<LoginUserMutation, LoginUserMutationVariables> mutation={LoginUserDocument} {...props} />
+    );
+    
+export type LoginUserProps<TChildProps = {}> = ApolloReactHoc.MutateProps<LoginUserMutation, LoginUserMutationVariables> & TChildProps;
+export function withLoginUser<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  LoginUserMutation,
+  LoginUserMutationVariables,
+  LoginUserProps<TChildProps>>) {
+    return ApolloReactHoc.withMutation<TProps, LoginUserMutation, LoginUserMutationVariables, LoginUserProps<TChildProps>>(LoginUserDocument, {
+      alias: 'loginUser',
+      ...operationOptions
+    });
+};
+
+    export function useLoginUserMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<LoginUserMutation, LoginUserMutationVariables>) {
+      return ApolloReactHooks.useMutation<LoginUserMutation, LoginUserMutationVariables>(LoginUserDocument, baseOptions);
+    }
+export type LoginUserMutationHookResult = ReturnType<typeof useLoginUserMutation>;
+export type LoginUserMutationResult = ApolloReactCommon.MutationResult<LoginUserMutation>;
+export type LoginUserMutationOptions = ApolloReactCommon.BaseMutationOptions<LoginUserMutation, LoginUserMutationVariables>;
+export const DeleteAllUsersDocument = gql`
+    mutation deleteAllUsers {
+  deleteAllUsers {
+    id
+    fullName
+    emailAddress
+    formattedBirthday
+  }
+}
+    `;
+export type DeleteAllUsersMutationFn = ApolloReactCommon.MutationFunction<DeleteAllUsersMutation, DeleteAllUsersMutationVariables>;
+export type DeleteAllUsersComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<DeleteAllUsersMutation, DeleteAllUsersMutationVariables>, 'mutation'>;
+
+    export const DeleteAllUsersComponent = (props: DeleteAllUsersComponentProps) => (
+      <ApolloReactComponents.Mutation<DeleteAllUsersMutation, DeleteAllUsersMutationVariables> mutation={DeleteAllUsersDocument} {...props} />
+    );
+    
+export type DeleteAllUsersProps<TChildProps = {}> = ApolloReactHoc.MutateProps<DeleteAllUsersMutation, DeleteAllUsersMutationVariables> & TChildProps;
+export function withDeleteAllUsers<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  DeleteAllUsersMutation,
+  DeleteAllUsersMutationVariables,
+  DeleteAllUsersProps<TChildProps>>) {
+    return ApolloReactHoc.withMutation<TProps, DeleteAllUsersMutation, DeleteAllUsersMutationVariables, DeleteAllUsersProps<TChildProps>>(DeleteAllUsersDocument, {
+      alias: 'deleteAllUsers',
+      ...operationOptions
+    });
+};
+
+    export function useDeleteAllUsersMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteAllUsersMutation, DeleteAllUsersMutationVariables>) {
+      return ApolloReactHooks.useMutation<DeleteAllUsersMutation, DeleteAllUsersMutationVariables>(DeleteAllUsersDocument, baseOptions);
+    }
+export type DeleteAllUsersMutationHookResult = ReturnType<typeof useDeleteAllUsersMutation>;
+export type DeleteAllUsersMutationResult = ApolloReactCommon.MutationResult<DeleteAllUsersMutation>;
+export type DeleteAllUsersMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteAllUsersMutation, DeleteAllUsersMutationVariables>;
