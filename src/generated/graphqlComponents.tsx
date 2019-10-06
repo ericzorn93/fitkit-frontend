@@ -75,6 +75,8 @@ export type Mutation = {
   deleteFood: Food,
   /** Finds an item of food, and updates the food with an associated cuisine. */
   updateFoodWithCuisine: Food,
+  /** Updates the food with the associated user in the database. */
+  updateFoodWithUsers: Food,
   createCuisine: Cuisine,
   deleteCuisine?: Maybe<Cuisine>,
 };
@@ -107,6 +109,11 @@ export type MutationDeleteFoodArgs = {
 
 export type MutationUpdateFoodWithCuisineArgs = {
   updateFoodCuisineData: UpdateFoodCuisineInput
+};
+
+
+export type MutationUpdateFoodWithUsersArgs = {
+  foodUserData: UpdateFoodUserInput
 };
 
 
@@ -147,6 +154,11 @@ export type RegisterUserInput = {
 export type UpdateFoodCuisineInput = {
   foodId: Scalars['String'],
   cuisineId: Scalars['String'],
+};
+
+export type UpdateFoodUserInput = {
+  foodId: Scalars['String'],
+  userIds: Array<Scalars['String']>,
 };
 
 export type User = {
@@ -247,6 +259,24 @@ export type AllFoodsWithCuisinesQuery = (
   )> }
 );
 
+export type UpdateFoodsWithUsersMutationVariables = {
+  foodId: Scalars['String'],
+  userIds: Array<Scalars['String']>
+};
+
+
+export type UpdateFoodsWithUsersMutation = (
+  { __typename?: 'Mutation' }
+  & { updateFoodWithUsers: (
+    { __typename?: 'Food' }
+    & Pick<Food, 'id' | 'name'>
+    & { users: Maybe<Array<(
+      { __typename?: 'User' }
+      & Pick<User, 'id' | 'fullName'>
+    )>> }
+  ) }
+);
+
 export type AllUsersQueryVariables = {};
 
 
@@ -306,6 +336,34 @@ export type DeleteAllUsersMutation = (
     { __typename?: 'User' }
     & Pick<User, 'id' | 'fullName' | 'emailAddress' | 'formattedBirthday'>
   )>> }
+);
+
+export type AllUsersWithFoodsQueryVariables = {};
+
+
+export type AllUsersWithFoodsQuery = (
+  { __typename?: 'Query' }
+  & { allUsers: Array<(
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'fullName'>
+    & { foods: Maybe<Array<(
+      { __typename?: 'Food' }
+      & Pick<Food, 'id' | 'name'>
+    )>> }
+  )> }
+);
+
+export type FindUserQueryVariables = {
+  userId: Scalars['String']
+};
+
+
+export type FindUserQuery = (
+  { __typename?: 'Query' }
+  & { findUser: (
+    { __typename?: 'User' }
+    & Pick<User, 'id' | 'fullName' | 'emailAddress' | 'age' | 'birthday'>
+  ) }
 );
 
 export const AllCuisinesDocument = gql`
@@ -521,6 +579,43 @@ export function withAllFoodsWithCuisines<TProps, TChildProps = {}>(operationOpti
       
 export type AllFoodsWithCuisinesQueryHookResult = ReturnType<typeof useAllFoodsWithCuisinesQuery>;
 export type AllFoodsWithCuisinesQueryResult = ApolloReactCommon.QueryResult<AllFoodsWithCuisinesQuery, AllFoodsWithCuisinesQueryVariables>;
+export const UpdateFoodsWithUsersDocument = gql`
+    mutation updateFoodsWithUsers($foodId: String!, $userIds: [String!]!) {
+  updateFoodWithUsers(foodUserData: {foodId: $foodId, userIds: $userIds}) {
+    id
+    name
+    users {
+      id
+      fullName
+    }
+  }
+}
+    `;
+export type UpdateFoodsWithUsersMutationFn = ApolloReactCommon.MutationFunction<UpdateFoodsWithUsersMutation, UpdateFoodsWithUsersMutationVariables>;
+export type UpdateFoodsWithUsersComponentProps = Omit<ApolloReactComponents.MutationComponentOptions<UpdateFoodsWithUsersMutation, UpdateFoodsWithUsersMutationVariables>, 'mutation'>;
+
+    export const UpdateFoodsWithUsersComponent = (props: UpdateFoodsWithUsersComponentProps) => (
+      <ApolloReactComponents.Mutation<UpdateFoodsWithUsersMutation, UpdateFoodsWithUsersMutationVariables> mutation={UpdateFoodsWithUsersDocument} {...props} />
+    );
+    
+export type UpdateFoodsWithUsersProps<TChildProps = {}> = ApolloReactHoc.MutateProps<UpdateFoodsWithUsersMutation, UpdateFoodsWithUsersMutationVariables> & TChildProps;
+export function withUpdateFoodsWithUsers<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  UpdateFoodsWithUsersMutation,
+  UpdateFoodsWithUsersMutationVariables,
+  UpdateFoodsWithUsersProps<TChildProps>>) {
+    return ApolloReactHoc.withMutation<TProps, UpdateFoodsWithUsersMutation, UpdateFoodsWithUsersMutationVariables, UpdateFoodsWithUsersProps<TChildProps>>(UpdateFoodsWithUsersDocument, {
+      alias: 'updateFoodsWithUsers',
+      ...operationOptions
+    });
+};
+
+    export function useUpdateFoodsWithUsersMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateFoodsWithUsersMutation, UpdateFoodsWithUsersMutationVariables>) {
+      return ApolloReactHooks.useMutation<UpdateFoodsWithUsersMutation, UpdateFoodsWithUsersMutationVariables>(UpdateFoodsWithUsersDocument, baseOptions);
+    }
+export type UpdateFoodsWithUsersMutationHookResult = ReturnType<typeof useUpdateFoodsWithUsersMutation>;
+export type UpdateFoodsWithUsersMutationResult = ApolloReactCommon.MutationResult<UpdateFoodsWithUsersMutation>;
+export type UpdateFoodsWithUsersMutationOptions = ApolloReactCommon.BaseMutationOptions<UpdateFoodsWithUsersMutation, UpdateFoodsWithUsersMutationVariables>;
 export const AllUsersDocument = gql`
     query allUsers {
   allUsers {
@@ -673,3 +768,80 @@ export function withDeleteAllUsers<TProps, TChildProps = {}>(operationOptions?: 
 export type DeleteAllUsersMutationHookResult = ReturnType<typeof useDeleteAllUsersMutation>;
 export type DeleteAllUsersMutationResult = ApolloReactCommon.MutationResult<DeleteAllUsersMutation>;
 export type DeleteAllUsersMutationOptions = ApolloReactCommon.BaseMutationOptions<DeleteAllUsersMutation, DeleteAllUsersMutationVariables>;
+export const AllUsersWithFoodsDocument = gql`
+    query allUsersWithFoods {
+  allUsers {
+    id
+    fullName
+    foods {
+      id
+      name
+    }
+  }
+}
+    `;
+export type AllUsersWithFoodsComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<AllUsersWithFoodsQuery, AllUsersWithFoodsQueryVariables>, 'query'>;
+
+    export const AllUsersWithFoodsComponent = (props: AllUsersWithFoodsComponentProps) => (
+      <ApolloReactComponents.Query<AllUsersWithFoodsQuery, AllUsersWithFoodsQueryVariables> query={AllUsersWithFoodsDocument} {...props} />
+    );
+    
+export type AllUsersWithFoodsProps<TChildProps = {}> = ApolloReactHoc.DataProps<AllUsersWithFoodsQuery, AllUsersWithFoodsQueryVariables> & TChildProps;
+export function withAllUsersWithFoods<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  AllUsersWithFoodsQuery,
+  AllUsersWithFoodsQueryVariables,
+  AllUsersWithFoodsProps<TChildProps>>) {
+    return ApolloReactHoc.withQuery<TProps, AllUsersWithFoodsQuery, AllUsersWithFoodsQueryVariables, AllUsersWithFoodsProps<TChildProps>>(AllUsersWithFoodsDocument, {
+      alias: 'allUsersWithFoods',
+      ...operationOptions
+    });
+};
+
+    export function useAllUsersWithFoodsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<AllUsersWithFoodsQuery, AllUsersWithFoodsQueryVariables>) {
+      return ApolloReactHooks.useQuery<AllUsersWithFoodsQuery, AllUsersWithFoodsQueryVariables>(AllUsersWithFoodsDocument, baseOptions);
+    }
+      export function useAllUsersWithFoodsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<AllUsersWithFoodsQuery, AllUsersWithFoodsQueryVariables>) {
+        return ApolloReactHooks.useLazyQuery<AllUsersWithFoodsQuery, AllUsersWithFoodsQueryVariables>(AllUsersWithFoodsDocument, baseOptions);
+      }
+      
+export type AllUsersWithFoodsQueryHookResult = ReturnType<typeof useAllUsersWithFoodsQuery>;
+export type AllUsersWithFoodsQueryResult = ApolloReactCommon.QueryResult<AllUsersWithFoodsQuery, AllUsersWithFoodsQueryVariables>;
+export const FindUserDocument = gql`
+    query findUser($userId: String!) {
+  findUser(userId: $userId) {
+    id
+    fullName
+    emailAddress
+    age
+    birthday
+  }
+}
+    `;
+export type FindUserComponentProps = Omit<ApolloReactComponents.QueryComponentOptions<FindUserQuery, FindUserQueryVariables>, 'query'> & ({ variables: FindUserQueryVariables; skip?: boolean; } | { skip: boolean; });
+
+    export const FindUserComponent = (props: FindUserComponentProps) => (
+      <ApolloReactComponents.Query<FindUserQuery, FindUserQueryVariables> query={FindUserDocument} {...props} />
+    );
+    
+export type FindUserProps<TChildProps = {}> = ApolloReactHoc.DataProps<FindUserQuery, FindUserQueryVariables> & TChildProps;
+export function withFindUser<TProps, TChildProps = {}>(operationOptions?: ApolloReactHoc.OperationOption<
+  TProps,
+  FindUserQuery,
+  FindUserQueryVariables,
+  FindUserProps<TChildProps>>) {
+    return ApolloReactHoc.withQuery<TProps, FindUserQuery, FindUserQueryVariables, FindUserProps<TChildProps>>(FindUserDocument, {
+      alias: 'findUser',
+      ...operationOptions
+    });
+};
+
+    export function useFindUserQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<FindUserQuery, FindUserQueryVariables>) {
+      return ApolloReactHooks.useQuery<FindUserQuery, FindUserQueryVariables>(FindUserDocument, baseOptions);
+    }
+      export function useFindUserLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<FindUserQuery, FindUserQueryVariables>) {
+        return ApolloReactHooks.useLazyQuery<FindUserQuery, FindUserQueryVariables>(FindUserDocument, baseOptions);
+      }
+      
+export type FindUserQueryHookResult = ReturnType<typeof useFindUserQuery>;
+export type FindUserQueryResult = ApolloReactCommon.QueryResult<FindUserQuery, FindUserQueryVariables>;

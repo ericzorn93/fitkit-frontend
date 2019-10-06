@@ -17,3 +17,14 @@ query allFoodsWithCuisines {
     }
   }
 }
+
+mutation updateFoodsWithUsers($foodId: String!, $userIds: [String!]!) {
+  updateFoodWithUsers(foodUserData: { foodId: $foodId, userIds: $userIds }) {
+    id
+    name
+    users {
+      id
+      fullName
+    }
+  }
+}
